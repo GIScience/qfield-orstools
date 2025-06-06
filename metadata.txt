@@ -1,0 +1,7 @@
+[general]
+name=openrouteservice Routing
+description=Provides routing visualization within QField
+author=Till Frankenbach
+icon=icon.svg
+version=1.0
+homepage=https://www.heigit.org/
