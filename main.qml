@@ -122,7 +122,7 @@ height: mainWindow.height
     mapSettings: mapCanvas.mapSettings
     geometryWrapper.crs: CoordinateReferenceSystemUtils.wgs84Crs()
     lineWidth: 6
-    color: "#99562b7a"
+    color: "#c62828"
   }
 
   Rectangle {
