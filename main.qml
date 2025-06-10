@@ -66,7 +66,9 @@ Item {
         bgcolor: "red"
         round: true
         onClicked: {
-            mainWindow.displayToast(qsTr('Settings button clicked'));
+            routeStartPoint = undefined;
+            routeEndPoint = undefined;
+            routeRenderer.geometryWrapper.qgsGeometry = GeometryUtils.createGeometryFromWkt("");
             settingsDialog.open();
         }
     }
