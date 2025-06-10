@@ -61,9 +61,7 @@ Item {
     QfToolButton {
         id: settingsButton
 
-        iconSource: 'icon.svg'
-        iconColor: "white"
-        bgcolor: "red"
+        iconSource: 'icon.png'
         round: true
         onClicked: {
             routeStartPoint = undefined;
