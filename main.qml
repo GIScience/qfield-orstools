@@ -103,12 +103,13 @@ Item {
             ComboBox {
                 id: profileSelector
 
-                width: parent.width
+                width: 250
                 model: ["driving-car", "driving-hgv", "cycling-regular", "cycling-road", "cycling-mountain", "cycling-electric", "foot-walking", "foot-hiking", "wheelchair"]
                 currentIndex: {
                     const saved = settings.value("orstools/profile", "driving-car");
                     model.indexOf(saved) >= 0 ? model.indexOf(saved) : 0;
                 }
+                popup.z: 10001
             }
 
         }
