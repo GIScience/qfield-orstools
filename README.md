@@ -4,7 +4,7 @@ This [QField](https://qfield.org) plugin enables users to retrieve
 the shortest paths between two points and display the journey on top of their
 map canvas.
 
-The plugin is based on the [QField OSRM plugin](https://github.com/opengisch/qfield-osrm), but replaces the routing backend with [OpenRouteService](https://openrouteservice.org/). ORS provides a rich set of routing profiles and global coverage. Big thanks to the OpenRouteService team for maintaining this powerful service!
+The plugin is based on the [QField OSRM plugin](https://github.com/opengisch/qfield-osrm), but replaces the routing backend with [OpenRouteService](https://openrouteservice.org/). ORS provides a rich set of routing profiles and global coverage.
 
 # Installation
 
