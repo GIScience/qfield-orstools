@@ -153,6 +153,9 @@ Item {
             routeStartPoint = undefined;
             routeEndPoint = undefined;
             routeRenderer.geometryWrapper.qgsGeometry = GeometryUtils.createGeometryFromWkt("");
+            for (let i = 0; i < isochroneRenderersRepeater.count; i++) {
+                    isochroneRenderersRepeater.itemAt(i).geometryWrapper.qgsGeometry = GeometryUtils.createGeometryFromWkt("");
+            }   
             settingsDialog.open();
         }
     }
