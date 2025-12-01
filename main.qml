@@ -198,9 +198,26 @@ Item {
         }
 
         QfToolButton {
-            id: clearPointsButton
+            id: isochroneButton
 
             anchors.left: addEndPointButton.right
+            anchors.leftMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.height - 10
+            height: width
+            iconSource: 'isochroneIcon.svg'
+            iconColor: "white"
+            round: true
+            onClicked: {
+                // TODO: Implement isochrone functionality
+                canvasMenu.close();
+            }
+        }
+
+        QfToolButton {
+            id: clearPointsButton
+
+            anchors.left: isochroneButton.right
             anchors.leftMargin: 5
             anchors.verticalCenter: parent.verticalCenter
             width: parent.height - 10
