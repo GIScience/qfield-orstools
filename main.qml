@@ -85,11 +85,11 @@ Item {
         standardButtons: Dialog.Ok
         onAccepted: {
             settings.setValue("orstools/api_key", apiKeyField.text);
-            settings.setValue("orstools/profile", profileSelector.currentText);
+            settings.setValue("orstools/profile", profileSelector.currentIndex);
             settings.setValue("orstools/isochrone_range_a", range_a.text);
             settings.setValue("orstools/isochrone_range_b", range_b.text);
             settings.setValue("orstools/isochrone_range_c", range_c.text);
-            settings.setValue("orstools/isochrone_range_type", isochroneRangeType.currentText);
+            settings.setValue("orstools/isochrone_range_type", isochroneRangeType.currentIndex);
         }
 
         Column {
@@ -115,9 +115,7 @@ Item {
                 width: 250
                 model: ["driving-car", "driving-hgv", "cycling-regular", "cycling-road", "cycling-mountain", "cycling-electric", "foot-walking", "foot-hiking", "wheelchair"]
                 currentIndex: {
-                    const saved = settings.value("orstools/profile", "driving-car");
-                    model.indexOf(saved) >= 0 ? model.indexOf(saved) : 0;
-                }
+                    const saved = settings.value("orstools/profile", 0);                }
                 popup.z: 10001
             }
 
@@ -177,8 +175,7 @@ Item {
                 width: 250
                 model: ["time", "distance"]
                 currentIndex: {
-                    const saved = settings.value("orstools/isochrone_range_type", "time");
-                    model.indexOf(saved) >= 0 ? model.indexOf(saved) : 0;
+                    const saved = settings.value("orstools/isochrone_range_type", 0);
                 }
             }
         }
