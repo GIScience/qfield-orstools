@@ -86,11 +86,20 @@ Item {
         onAccepted: {
             settings.setValue("orstools/api_key", apiKeyField.text);
             settings.setValue("orstools/profile", profileSelector.currentText);
+            settings.setValue("orstools/isochrone_range_a", range_a.text);
+            settings.setValue("orstools/isochrone_range_b", range_b.text);
+            settings.setValue("orstools/isochrone_range_c", range_c.text);
+            settings.setValue("orstools/isochrone_range_type", isochroneRangeType.currentText);
         }
 
         Column {
             spacing: 12
             width: parent.width
+
+
+            Text {
+                text: "General Settings"
+            }
 
             TextField {
                 id: apiKeyField
@@ -112,8 +121,67 @@ Item {
                 popup.z: 10001
             }
 
-        }
+            Text {
+                text: "Isochrones"
+            }
 
+            Row {
+                spacing: 10
+                
+                Column {
+                    TextField {
+                        id: range_a
+                        width: 100
+                        text: settings.value("orstools/isochrone_range_a", "300")
+                        validator: IntValidator { bottom: 1; top: 100000 }
+                        font: Theme.defaultFont
+                    }
+                    Text {
+                        text: "Range A"
+                        font: Theme.defaultFont
+                    }
+                }
+                
+                Column {
+                    TextField {
+                        id: range_b
+                        width: 100
+                        text: settings.value("orstools/isochrone_range_b", "600")
+                        validator: IntValidator { bottom: 1; top: 100000 }
+                        font: Theme.defaultFont
+                    }
+                    Text {
+                        text: "Range B"
+                        font: Theme.defaultFont
+                    }
+                }
+                
+                Column {
+                    TextField {
+                        id: range_c
+                        width: 100
+                        text: settings.value("orstools/isochrone_range_c", "900")
+                        validator: IntValidator { bottom: 1; top: 100000 }
+                        font: Theme.defaultFont
+                    }
+                    Text {
+                        text: "Range C"
+                        font: Theme.defaultFont
+                    }
+                }
+            }
+
+            ComboBox {
+                id: isochroneRangeType
+
+                width: 250
+                model: ["time", "distance"]
+                currentIndex: {
+                    const saved = settings.value("orstools/isochrone_range_type", "time");
+                    model.indexOf(saved) >= 0 ? model.indexOf(saved) : 0;
+                }
+            }
+        }
     }
 
     Marker {
