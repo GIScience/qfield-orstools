@@ -18,8 +18,11 @@ Item {
     property var routeEndPoint: undefined
     property var routeRequest: undefined
     property var routeJson: undefined
+    property var isochroneRequest: undefined
+    property var isochroneJson: undefined
     property var apiKey: undefined
     property var routeProfile: "driving-car"
+    property var profiles: ["driving-car", "driving-hgv", "cycling-regular", "cycling-road", "cycling-mountain", "cycling-electric", "foot-walking", "foot-hiking", "wheelchair"]
 
     function getRoute() {
         routeRequest = new XMLHttpRequest();
@@ -31,11 +34,43 @@ Item {
         };
         const start = routeStartPoint.x + "," + routeStartPoint.y;
         const end = routeEndPoint.x + "," + routeEndPoint.y;
-        const routeProfile = settings.value("orstools/profile", "");
+        const profileIndex = settings.value("orstools/profile", 0);
+        const routeProfile = profiles[profileIndex];
         const apiKey = settings.value("orstools/api_key", "");
         const url = "https://api.openrouteservice.org/v2/directions/" + routeProfile + "?api_key=" + apiKey + "&start=" + start + "&end=" + end;
         routeRequest.open("GET", url);
         routeRequest.send();
+    }
+
+    function getIsochrone() {
+        isochroneRequest = new XMLHttpRequest();
+        isochroneRequest.onreadystatechange = () => {
+            if (isochroneRequest.readyState === XMLHttpRequest.DONE) {
+                isochroneJson = JSON.parse(isochroneRequest.response);
+                processIsochrone();
+            }
+        };
+        
+        const point = GeometryUtils.reprojectPointToWgs84(canvasMenu.point, mapCanvas.mapSettings.destinationCrs);
+        const profileIndex = settings.value("orstools/profile", 0);
+        const routeProfile = profiles[profileIndex];
+        const apiKey = settings.value("orstools/api_key", "");
+        const rangeA = parseInt(settings.value("orstools/isochrone_range_a", "300"));
+        const rangeB = parseInt(settings.value("orstools/isochrone_range_b", "600"));
+        const rangeC = parseInt(settings.value("orstools/isochrone_range_c", "900"));
+        const rangeType = settings.value("orstools/isochrone_range_type", 0) == 0 ? "time" : "distance";
+        
+        const url = "https://api.openrouteservice.org/v2/isochrones/" + routeProfile;
+        const payload = {
+            "locations": [[point.x, point.y]],
+            "range": [rangeA, rangeB, rangeC],
+            "range_type": rangeType
+        };
+        
+        isochroneRequest.open("POST", url);
+        isochroneRequest.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+        isochroneRequest.setRequestHeader("Authorization", apiKey);
+        isochroneRequest.send(JSON.stringify(payload));
     }
 
     function processRoute() {
@@ -48,6 +83,57 @@ Item {
             }
             const wkt = "LINESTRING(" + points.join(",") + ")";
             routeRenderer.geometryWrapper.qgsGeometry = GeometryUtils.createGeometryFromWkt(wkt);
+        }
+    }
+
+    function processIsochrone() {
+        if (isochroneJson !== undefined && isochroneJson['features']) {
+            let features = isochroneJson['features'].sort((a, b) => {
+                return a.properties.value - b.properties.value;
+            });            
+            for (let i = 0; i < features.length; i++) {
+                if (features[i]['geometry'] && features[i]['geometry']['coordinates']) {
+                    let rings = [];
+                    
+                    for (let ring of features[i]['geometry']['coordinates']) {
+                        let points = [];
+                        for (let coord of ring) {
+                            points.push(coord[0] + ' ' + coord[1]);
+                        }
+                        rings.push('(' + points.join(',') + ')');
+                    }
+                    
+                    if (i > 0 && features[i-1]['geometry'] && features[i-1]['geometry']['coordinates']) {
+                        for (let ring of features[i-1]['geometry']['coordinates']) {
+                            let points = [];
+                            for (let coord of ring) {
+                                points.push(coord[0] + ' ' + coord[1]);
+                            }
+                            rings.push('(' + points.join(',') + ')');
+                        }
+                    }
+                    
+                    const wkt = "POLYGON(" + rings.join(',') + ")";
+                    
+                    if (isochroneRenderersRepeater && isochroneRenderersRepeater.itemAt(i)) {
+                        isochroneRenderersRepeater.itemAt(i).geometryWrapper.qgsGeometry = GeometryUtils.createGeometryFromWkt(wkt);
+                    }
+                }
+            }
+        }
+    }
+    
+    property var isochroneColors: [ "#4c84af", "#fff764", "#f47f36" ]
+    Repeater {
+        id: isochroneRenderersRepeater
+        model: plugin.isochroneColors
+        QFieldItems.GeometryRenderer {
+            parent: mapCanvas
+            mapSettings: mapCanvas.mapSettings
+            geometryWrapper.crs: CoordinateReferenceSystemUtils.wgs84Crs()
+            color: modelData
+            opacity: 0.6
+            lineWidth: 2
         }
     }
 
@@ -113,7 +199,7 @@ Item {
                 id: profileSelector
 
                 width: 250
-                model: ["driving-car", "driving-hgv", "cycling-regular", "cycling-road", "cycling-mountain", "cycling-electric", "foot-walking", "foot-hiking", "wheelchair"]
+                model: profiles
                 currentIndex: {
                     const saved = settings.value("orstools/profile", 0);                }
                 popup.z: 10001
@@ -274,7 +360,7 @@ Item {
             iconColor: "white"
             round: true
             onClicked: {
-                // TODO: Implement isochrone functionality
+                getIsochrone();
                 canvasMenu.close();
             }
         }
@@ -290,12 +376,15 @@ Item {
             iconSource: 'routeClearIcon.svg'
             iconColor: "white"
             round: true
-            enabled: routeStartPoint != undefined || routeEndPoint != undefined
+            enabled: routeStartPoint != undefined || routeEndPoint != undefined || isochroneRenderersRepeater.count > 0
             opacity: enabled ? 1 : 0.5
             onClicked: {
                 routeStartPoint = undefined;
                 routeEndPoint = undefined;
                 routeRenderer.geometryWrapper.qgsGeometry = GeometryUtils.createGeometryFromWkt("");
+                for (let i = 0; i < isochroneRenderersRepeater.count; i++) {
+                    isochroneRenderersRepeater.itemAt(i).geometryWrapper.qgsGeometry = GeometryUtils.createGeometryFromWkt("");
+                }   
                 canvasMenu.close();
             }
         }
