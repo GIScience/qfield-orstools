@@ -54,7 +54,7 @@ Item {
     width: mainWindow.width
     height: mainWindow.height
     Component.onCompleted: {
-        iface.addItemToCanvasActionsToolbar(pluginButtonsContainer);
+        iface.addItemToCanvasActionsToolbar(routingPluginButtonsContainer);
         iface.addItemToPluginsToolbar(settingsButton);
     }
 
@@ -149,7 +149,7 @@ Item {
     }
 
     Rectangle {
-        id: pluginButtonsContainer
+        id: routingPluginButtonsContainer
 
         width: childrenRect.width + 10
         height: 48
