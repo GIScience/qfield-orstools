@@ -149,6 +149,7 @@ Item {
 
         iconSource: 'icon.png'
         round: true
+        bgcolor: "white"
         onClicked: {
             routeStartPoint = undefined;
             routeEndPoint = undefined;
