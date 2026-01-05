@@ -42,6 +42,15 @@ Item {
         routeRequest.send();
     }
 
+    function convertRangeValue(rangeValue) {
+        const rangeTypeIndex = settings.value("orstools/isochrone_range_type", 0);
+        if (rangeTypeIndex == 0) {
+            return rangeValue * 60;
+        } else {
+            return rangeValue * 1000;
+        }
+    }
+
     function getIsochrone() {
         isochroneRequest = new XMLHttpRequest();
         isochroneRequest.onreadystatechange = () => {
@@ -55,9 +64,9 @@ Item {
         const profileIndex = settings.value("orstools/profile", 0);
         const routeProfile = profiles[profileIndex];
         const apiKey = settings.value("orstools/api_key", "");
-        const rangeA = parseInt(settings.value("orstools/isochrone_range_a", "300"));
-        const rangeB = parseInt(settings.value("orstools/isochrone_range_b", "600"));
-        const rangeC = parseInt(settings.value("orstools/isochrone_range_c", "900"));
+        const rangeA = convertRangeValue(parseInt(settings.value("orstools/isochrone_range_a", "300")));
+        const rangeB = convertRangeValue(parseInt(settings.value("orstools/isochrone_range_b", "600")));
+        const rangeC = convertRangeValue(parseInt(settings.value("orstools/isochrone_range_c", "900")));
         const rangeType = settings.value("orstools/isochrone_range_type", 0) == 0 ? "time" : "distance";
         
         const url = "https://api.openrouteservice.org/v2/isochrones/" + routeProfile;
