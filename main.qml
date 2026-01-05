@@ -263,7 +263,7 @@ Item {
                 id: isochroneRangeType
 
                 width: 250
-                model: ["time", "distance"]
+                model: ["time (min)", "distance (km)"]
                 currentIndex: {
                     const saved = settings.value("orstools/isochrone_range_type", 0);
                 }
